@@ -3,13 +3,13 @@ import { isStaging } from '../url/helpers';
 
 export const APP_IDS = {
     LOCALHOST: 36300,
-    TMP_STAGING: 68848,
-    STAGING: 68848,
-    STAGING_BE: 68848,
-    STAGING_ME: 68848,
-    PRODUCTION: 68848,
-    PRODUCTION_BE: 68848,
-    PRODUCTION_ME: 68848,
+    TMP_STAGING: 70827,
+    STAGING: 70827,
+    STAGING_BE: 70827,
+    STAGING_ME: 70827,
+    PRODUCTION: 70827,
+    PRODUCTION_BE: 70827,
+    PRODUCTION_ME: 70827,
 };
 
 export const livechat_license_id = 12049137;
