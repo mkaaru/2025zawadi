@@ -179,8 +179,8 @@ export default class ClientStore {
 
             if (!is_logged_in) return '';
             if (!gaming_company?.shortcode && financial_company?.shortcode === 'maltainvest') {
-                if (this.is_virtual) return ContentFlag.EU_DEMO;
-                return ContentFlag.EU_REAL;
+                if (this.is_virtual) return ContentFlag.HIGH_RISK_CR;
+                return ContentFlag.CR_DEMO;
             } else if (
                 financial_company?.shortcode === 'maltainvest' &&
                 gaming_company?.shortcode === 'svg' &&

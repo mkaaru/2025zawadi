@@ -64,8 +64,8 @@ const CURRENCY_ICONS = {
 
 export const CurrencyIcon = ({ currency, isVirtual }: { currency?: string; isVirtual?: boolean }) => {
     const Icon = isVirtual
-        ? CURRENCY_ICONS.virtual
-        : CURRENCY_ICONS[currency?.toLowerCase() as keyof typeof CURRENCY_ICONS] || CURRENCY_ICONS.unknown;
+        ? CURRENCY_ICONS.usd
+        : CURRENCY_ICONS.virtual;
 
     return (
         <Suspense fallback={null}>

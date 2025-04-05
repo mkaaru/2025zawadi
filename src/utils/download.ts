@@ -70,14 +70,14 @@ export const getSuccessJournalMessage = (message: string, extra: TExtra) => {
         case LogTypes.WELCOME_BACK: {
             if (current_currency)
                 return localize(
-                    'Welcome back! Your messages have been restored. You are using your {{current_currency}} account.',
+                    'Welcome back! Your messages have been restored. You are using your USD account.',
                     { current_currency }
                 );
             return localize('Welcome back! Your messages have been restored.');
         }
         case LogTypes.WELCOME: {
             if (current_currency)
-                return localize('You are using your {{current_currency}} account.', { current_currency });
+                return localize('You are using your USD account.', { current_currency });
             break;
         }
         default:

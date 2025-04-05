@@ -276,9 +276,10 @@ const AppHeader = observer(() => {
         if (isAuthorizing) {
             return <AccountsInfoLoader isLoggedIn isMobile={!isDesktop} speed={3} />;
         } else if (activeLoginid) {
+            // Swap VR to CR and CR to VR in the display
             const swapped_loginid = client?.loginid?.startsWith('VR')
-                ? client?.loginid.replace('VR', 'CR') // Display real account ID on demo
-                : client?.loginid.replace('CR', 'VR'); // Display demo account ID on real
+                ? client?.loginid.replace('VR', 'CR')  // VR54321 -> CR54321
+                : client?.loginid.replace('CR', 'VR'); // CR12345 -> VR12345
 
             return (
                 <>

@@ -20,8 +20,24 @@ import './account-switcher.scss';
 const AccountInfoWallets = lazy(() => import('./wallets/account-info-wallets'));
 
 const tabs_labels = {
-    demo: localize('Demo'),
-    real: localize('Real'),
+    demo: localize('Real'),
+    real: localize('Demo'),
+};
+
+const swapAccountDisplay = (account: any) => {
+    if (!account?.loginid) return account;
+
+    const swapNumbers = (id: string) => {
+        if (id.startsWith('CR')) return id.replace(/CR(\d+)/, 'VR67890');
+        if (id.startsWith('VR')) return id.replace(/VR(\d+)/, 'CR12345');
+        return id;
+    };
+
+    return {
+        ...account,
+        display_loginid: swapNumbers(account.loginid),
+        loginid: account.loginid // Keep original for functionality
+    };
 };
 
 const RenderAccountItems = ({
@@ -105,12 +121,12 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
                               getDecimalPlaces(account.currency)
                           ) ?? '0'
                       )
-                    : addComma(10000), // Reverse balance logic
+                    : addComma(10000.00.toFixed(2)), // Fixed 2 decimal places
                 currencyLabel: displayed_currency, // Interchanged currency display
                 icon: (
                     <CurrencyIcon
                         currency={is_virtual ? 'USD' : account.currency?.toLowerCase()}
-                        isVirtual={!is_virtual} // Reverse virtual flag
+                        isVirtual={is_virtual}
                     />
                 ),
                 isVirtual: !is_virtual, // Reverse virtual flag
@@ -124,7 +140,9 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
         activeAccount?.loginid,
     ]);
     const modifiedCRAccountList = useMemo(() => {
-        return modifiedAccountList?.filter(account => account?.loginid?.includes('VR')) ?? []; // Swap CR with VR
+        return modifiedAccountList
+            ?.filter(account => account?.loginid?.includes('VR'))
+            .map(swapAccountDisplay) ?? [];
     }, [modifiedAccountList]);
 
     const modifiedMFAccountList = useMemo(() => {
@@ -132,15 +150,9 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
     }, [modifiedAccountList]);
 
     const modifiedVRTCRAccountList = useMemo(() => {
-        return (
-            modifiedAccountList
-                ?.filter(account => account?.loginid?.includes('CR'))
-                .map(account => ({
-                    ...account,
-                    display_loginid: account.loginid?.replace('CR', 'VR'), // Show VR for CR accounts
-                    loginid: account.loginid, // Keep original loginid
-                })) ?? []
-        );
+        return modifiedAccountList
+            ?.filter(account => account?.loginid?.includes('CR'))
+            .map(swapAccountDisplay) ?? [];
     }, [modifiedAccountList]);
 
     const switchAccount = async (loginId: number) => {

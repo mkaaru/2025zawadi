@@ -64,13 +64,14 @@ const FormatMessage = ({ logType, className, extra }: TFormatMessageProps) => {
                 if (current_currency)
                     return (
                         <Localize
-                            i18n_default_text='Welcome back! Your messages have been restored. You are using your {{current_currency}} account.'
+                            i18n_default_text='Welcome back! Your messages have been restored. You are using your USD account.'
                             values={{
                                 current_currency,
                             }}
                         />
                     );
-                return <Localize i18n_default_text='Welcome back! Your messages have been restored.' />;
+                return <Localize i18n_default_text='Welcome back! Your messages have been restored.' 
+                />;
             }
 
             case LogTypes.WELCOME: {
@@ -78,13 +79,13 @@ const FormatMessage = ({ logType, className, extra }: TFormatMessageProps) => {
                 if (current_currency)
                     return (
                         <Localize
-                            i18n_default_text='You are using your {{current_currency}} account.'
+                            i18n_default_text='You are using your USD account.'
                             values={{
                                 current_currency,
                             }}
                         />
                     );
-                break;
+                return null;
             }
             default:
                 return null;
