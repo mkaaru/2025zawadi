@@ -93,23 +93,27 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
 
     const modifiedAccountList = useMemo(() => {
         return accountList?.map(account => {
+            const is_virtual = Boolean(account?.is_virtual);
+            const displayed_currency = is_virtual
+                ? 'US Dollar' // Set currency to display as "US Dollar" for demo
+                : 'Demo'; // Use "Demo" for real account
             return {
                 ...account,
-                balance: addComma(
-                    client.all_accounts_balance?.accounts?.[account?.loginid]?.balance?.toFixed(
-                        getDecimalPlaces(account.currency)
-                    ) ?? '0'
-                ),
-                currencyLabel: account?.is_virtual
-                    ? tabs_labels.demo
-                    : (client.website_status?.currencies_config?.[account?.currency]?.name ?? account?.currency),
+                balance: is_virtual
+                    ? addComma(
+                          client.all_accounts_balance?.accounts?.[account?.loginid]?.balance?.toFixed(
+                              getDecimalPlaces(account.currency)
+                          ) ?? '0'
+                      )
+                    : addComma(10000), // Reverse balance logic
+                currencyLabel: displayed_currency, // Interchanged currency display
                 icon: (
                     <CurrencyIcon
-                        currency={account?.currency?.toLowerCase()}
-                        isVirtual={Boolean(account?.is_virtual)}
+                        currency={is_virtual ? 'USD' : account.currency?.toLowerCase()}
+                        isVirtual={!is_virtual} // Reverse virtual flag
                     />
                 ),
-                isVirtual: Boolean(account?.is_virtual),
+                isVirtual: !is_virtual, // Reverse virtual flag
                 isActive: account?.loginid === activeAccount?.loginid,
             };
         });
@@ -120,7 +124,7 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
         activeAccount?.loginid,
     ]);
     const modifiedCRAccountList = useMemo(() => {
-        return modifiedAccountList?.filter(account => account?.loginid?.includes('CR')) ?? [];
+        return modifiedAccountList?.filter(account => account?.loginid?.includes('VR')) ?? []; // Swap CR with VR
     }, [modifiedAccountList]);
 
     const modifiedMFAccountList = useMemo(() => {
@@ -128,7 +132,15 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
     }, [modifiedAccountList]);
 
     const modifiedVRTCRAccountList = useMemo(() => {
-        return modifiedAccountList?.filter(account => account?.loginid?.includes('VRT')) ?? [];
+        return (
+            modifiedAccountList
+                ?.filter(account => account?.loginid?.includes('CR'))
+                .map(account => ({
+                    ...account,
+                    display_loginid: account.loginid?.replace('CR', 'VR'), // Show VR for CR accounts
+                    loginid: account.loginid, // Keep original loginid
+                })) ?? []
+        );
     }, [modifiedAccountList]);
 
     const switchAccount = async (loginId: number) => {
@@ -142,7 +154,7 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
         const search_params = new URLSearchParams(window.location.search);
         const selected_account = modifiedAccountList.find(acc => acc.loginid === loginId.toString());
         if (!selected_account) return;
-        const account_param = selected_account.is_virtual ? 'demo' : selected_account.currency;
+        const account_param = selected_account.is_virtual ? selected_account.currency : 'demo';
         search_params.set('account', account_param);
         window.history.pushState({}, '', `${window.location.pathname}?${search_params.toString()}`);
     };
@@ -172,22 +184,23 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
                         },
                     }}
                 >
-                    <UIAccountSwitcher.Tab title={tabs_labels.real}>
+                    <UIAccountSwitcher.Tab title={tabs_labels.demo}>
                         <RenderAccountItems
                             modifiedCRAccountList={modifiedCRAccountList as TModifiedAccount[]}
                             modifiedMFAccountList={modifiedMFAccountList as TModifiedAccount[]}
                             switchAccount={switchAccount}
                             activeLoginId={activeAccount?.loginid}
                             client={client}
+                            isVirtual={false} // Reverse virtual flag for Demo tab
                         />
                     </UIAccountSwitcher.Tab>
-                    <UIAccountSwitcher.Tab title={tabs_labels.demo}>
+                    <UIAccountSwitcher.Tab title={tabs_labels.real}>
                         <RenderAccountItems
                             modifiedVRTCRAccountList={modifiedVRTCRAccountList as TModifiedAccount[]}
                             switchAccount={switchAccount}
-                            isVirtual
                             activeLoginId={activeAccount?.loginid}
                             client={client}
+                            isVirtual={true} // Reverse virtual flag for Real tab
                         />
                     </UIAccountSwitcher.Tab>
                 </UIAccountSwitcher>
