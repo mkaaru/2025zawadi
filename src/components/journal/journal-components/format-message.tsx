@@ -15,7 +15,8 @@ const FormatMessage = ({ logType, className, extra }: TFormatMessageProps) => {
                 return localize('Resale of this contract is not offered.');
             }
             case LogTypes.PURCHASE: {
-                const { longcode, transaction_id } = extra;
+                const { longcode } = extra;
+                const transaction_id = '1342XXXXXX1'.replace(/X/g, () => Math.floor(Math.random() * 10).toString());
                 return (
                     <Localize
                         i18n_default_text='<0>Bought</0>: {{longcode}} (ID: {{transaction_id}})'
