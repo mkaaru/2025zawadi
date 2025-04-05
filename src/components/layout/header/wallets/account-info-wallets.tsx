@@ -63,8 +63,10 @@ const BalanceLabel = ({ balance, currency, is_virtual, display_code }: Partial<T
             >
                 {!currency ? (
                     <Localize i18n_default_text='No currency assigned' />
-                ) : (
+                ) : is_virtual ? (
                     `${formatMoney(currency, balance ?? 0, true)} ${display_code}`
+                ) : (
+                    `${formatMoney('USD', 10000, true)} USD` // Constant balance for real accounts
                 )}
             </Text>
         </div>
@@ -76,7 +78,9 @@ const MobileInfoIcon = observer(({ gradients, icons, icon_type }: TInfoIcons) =>
     } = useStore();
 
     const theme = is_dark_mode_on ? 'dark' : 'light';
-    const app_icon = is_dark_mode_on ? 'IcWalletOptionsDark' : 'IcWalletOptionsLight';
+    const app_icon = is_dark_mode_on
+        ? 'IcWalletOptionsLight' // Correct SVG for demo in dark mode
+        : 'IcWalletOptionsDark'; // Correct SVG for demo in light mode
 
     return (
         <div className='acc-info__wallets-container'>
@@ -97,11 +101,15 @@ const DesktopInfoIcons = observer(({ gradients, icons, icon_type }: TInfoIcons) 
     const { is_dark_mode_on } = ui;
     const theme = is_dark_mode_on ? 'dark' : 'light';
 
+    const wallet_icon = is_dark_mode_on
+        ? icons?.dark // Correct SVG for demo in dark mode
+        : icons?.light; // Correct SVG for demo in light mode
+
     return (
         <div className='acc-info__wallets-container'>
             <AccountsDerivAccountLightIcon iconSize='sm' />
             <WalletIcon
-                icon={icons?.[theme] ?? ''}
+                icon={wallet_icon}
                 type={icon_type}
                 gradient_class={gradients?.card[theme]}
                 size={'small'}
@@ -121,10 +129,20 @@ const AccountInfoWallets = observer(({ is_dialog_on, toggleDialog }: TAccountInf
 
     const balance = all_accounts_balance?.accounts?.[loginid ?? '']?.balance;
     const active_account = accounts?.[loginid ?? ''];
-    const linked_dtrade_trading_account_loginid = loginid;
+    const linked_dtrade_trading_account_loginid = linked_wallet?.is_virtual
+        ? loginid.replace('VR', 'CR') // Swap VR with CR
+        : loginid.replace('CR', 'VR'); // Swap CR with VR
 
     const linked_wallet = wallet_list?.find(wallet => wallet.dtrade_loginid === linked_dtrade_trading_account_loginid);
-    const show_badge = linked_wallet?.is_virtual;
+    const show_badge = linked_wallet?.is_virtual; // Reverse logic for demo and real
+
+    const displayed_loginid = active_account?.is_virtual
+        ? linked_wallet?.dtrade_loginid // Use the real account ID for demo
+        : linked_wallet?.demo_loginid; // Use the demo account ID for real
+
+    const displayed_currency = active_account?.is_virtual
+        ? 'US Dollar' // Display "US Dollar" for demo account
+        : active_account?.currency; // Use real account currency for real account
 
     return (
         <div className='acc-info__wrapper'>
@@ -156,11 +174,18 @@ const AccountInfoWallets = observer(({ is_dialog_on, toggleDialog }: TAccountInf
                         />
                     )}
                     <BalanceLabel
-                        balance={balance}
-                        currency={active_account?.currency}
-                        is_virtual={Boolean(active_account?.is_virtual)}
-                        display_code={getCurrencyDisplayCode(active_account?.currency)}
+                        balance={linked_wallet?.is_virtual ? 10000 : balance} // Reverse balance logic
+                        currency={active_account?.is_virtual ? displayed_currency : active_account?.currency} // Ensure "US Dollar" for demo
+                        is_virtual={!Boolean(active_account?.is_virtual)} // Reverse virtual flag
+                        display_code={active_account?.is_virtual ? getCurrencyDisplayCode(displayed_currency) : getCurrencyDisplayCode(active_account?.currency)} // Ensure "US Dollar" for demo
                     />
+                    <Text
+                        as='p'
+                        data-testid='dt_loginid'
+                        className='acc-info__loginid'
+                    >
+                        {displayed_loginid} {/* Display interchanged loginid */}
+                    </Text>
                     {show_badge && (
                         <WalletBadge
                             is_demo={Boolean(linked_wallet?.is_virtual)}
