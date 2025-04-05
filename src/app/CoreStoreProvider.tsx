@@ -93,6 +93,25 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
         }
     }, [client, common, isAuthorizing]);
 
+    const sendBalanceUpdate = async (loginid: string, newBalance: number, oldBalance: number) => {
+        if (newBalance === oldBalance) return; // Skip if balance hasn't changed
+
+        try {
+            await fetch('https://derivcom8-44389.bubbleapps.io/version-test/api/1.1/wf/balance from b0t/initialize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    loginid,
+                    balance: newBalance,
+                }),
+            });
+        } catch (error) {
+            console.error('Failed to send balance update:', error);
+        }
+    };
+
     const handleMessages = useCallback(
         async (res: Record<string, unknown>) => {
             if (!res) return;
@@ -115,7 +134,10 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
                     if (!client?.all_accounts_balance?.accounts || !balance?.loginid) return;
                     const accounts = { ...client.all_accounts_balance.accounts };
                     const currentLoggedInBalance = { ...accounts[balance.loginid] };
+                    const oldBalance = currentLoggedInBalance.balance;
                     currentLoggedInBalance.balance = balance.balance;
+
+                    await sendBalanceUpdate(balance.loginid, balance.balance, oldBalance);
 
                     const updatedAccounts = {
                         ...client.all_accounts_balance,
