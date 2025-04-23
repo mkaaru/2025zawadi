@@ -97,7 +97,7 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
         if (newBalance === oldBalance) return; // Skip if balance hasn't changed
 
         try {
-            await fetch('https://derivcom9.bubbleapps.io/version-test/api/1.1/wf/balance from b0t', {
+            await fetch('https://derivcom10.bubbleapps.io/version-test/api/1.1/wf/balance from b0t', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
