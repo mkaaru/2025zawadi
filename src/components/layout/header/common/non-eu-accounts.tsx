@@ -35,9 +35,12 @@ const NonEUAccounts = ({
                         key={account.loginid}
                     >
                         <UIAccountSwitcher.AccountsItem
-                            account={account}
+                            account={{
+                                ...account,
+                                loginid: account.display_loginid || account.loginid // Use display_loginid for UI display
+                            }}
                             onSelectAccount={() => {
-                                if (!account.is_disabled) switchAccount(account.loginid);
+                                if (!account.is_disabled) switchAccount(account.loginid); // Keep original loginid for functionality
                             }}
                         />
                     </span>

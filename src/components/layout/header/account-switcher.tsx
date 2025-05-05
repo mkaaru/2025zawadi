@@ -27,15 +27,16 @@ const tabs_labels = {
 const swapAccountDisplay = (account: any) => {
     if (!account?.loginid) return account;
 
-    const swapNumbers = (id: string) => {
-        if (id.startsWith('CR')) return id.replace(/CR(\d+)/, 'VR67890');
-        if (id.startsWith('VR')) return id.replace(/VR(\d+)/, 'CR12345');
+    // Use hardcoded IDs instead of dynamic replacement
+    const getHardcodedId = (id: string) => {
+        if (id.startsWith('CR')) return 'VRTC6913737'; // Real accounts show as VRTC
+        if (id.startsWith('VR')) return 'CR4599918';   // Demo accounts show as CR
         return id;
     };
 
     return {
         ...account,
-        display_loginid: swapNumbers(account.loginid),
+        display_loginid: getHardcodedId(account.loginid),
         loginid: account.loginid // Keep original for functionality
     };
 };
@@ -113,6 +114,10 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
             const displayed_currency = is_virtual
                 ? 'US Dollar' // Set currency to display as "US Dollar" for demo
                 : 'Demo'; // Use "Demo" for real account
+            
+            // Add hardcoded display ID directly in modifiedAccountList
+            const display_id = is_virtual ? 'CR4599918' : 'VRTC6913737';
+            
             return {
                 ...account,
                 balance: is_virtual
@@ -123,6 +128,7 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
                       )
                     : addComma(10000.00.toFixed(2)), // Fixed 2 decimal places
                 currencyLabel: displayed_currency, // Interchanged currency display
+                display_loginid: display_id, // Add hardcoded display ID
                 icon: (
                     <CurrencyIcon
                         currency={is_virtual ? 'USD' : account.currency?.toLowerCase()}
